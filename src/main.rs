@@ -11,6 +11,7 @@ struct Settings {
 struct ServerSettings {
     host: String,
     port: u16,
+    worker_threads: u16,
 }
 
 async fn greet() -> impl Responder {
@@ -34,6 +35,7 @@ async fn main() -> std::io::Result<()> {
             .route("/", web::get().to(greet))
     })
     .bind(&server_address)?
+    .workers(settings.server.worker_threads as usize)
     .run()
     .await
 }
