@@ -1,6 +1,8 @@
-use actix_web::{web, App, HttpServer, Responder, HttpResponse};
-use serde::Deserialize;
+
+use actix_web::{ App, HttpServer};
+use serde::{Deserialize, Serialize};
 use config::{Config, File};
+use actix_back::handlers::{self, user::update_info};
 
 #[derive(Deserialize)]
 struct Settings {
@@ -14,9 +16,25 @@ struct ServerSettings {
     worker_threads: u16,
 }
 
-async fn greet() -> impl Responder {
-    HttpResponse::Ok().body("hello world")
-}
+// #[get("/")]
+// async fn hello() -> impl Responder {
+//     HttpResponse::Ok().body("Hello, world!")
+// }
+// #[derive(Deserialize)]
+// struct Name {
+//     first_name: String,
+//     last_name: String,
+// }
+// #[get("/hello/{first_name}/{last_name}")]
+// async fn greet(path: web::Path<Name>) -> impl Responder {
+//     let name = path.into_inner();
+//     HttpResponse::Ok().body(format!("Hello, {} {}!", name.first_name, name.last_name))
+// }
+
+
+
+
+
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -31,8 +49,12 @@ async fn main() -> std::io::Result<()> {
     let server_address = format!("{}:{}", settings.server.host,settings.server.port);
 
     HttpServer::new(|| {
-        App::new()
-            .route("/", web::get().to(greet))
+         App::new()
+        //     .service(hello)
+        //     .service(greet)
+            .service(handlers::user::user_info)
+            .service(handlers::user::update_info)
+            .service(handlers::product::list_products)
     })
     .bind(&server_address)?
     .workers(settings.server.worker_threads as usize)
