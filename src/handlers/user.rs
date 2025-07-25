@@ -1,4 +1,5 @@
 use actix_web::{get,post, put, web,HttpResponse, Responder, Error};
+use crate::extractors::user::UserProfile;
 use crate::handlers::user;
 use crate::services::user as UserService;
 use crate::models::user::User;
@@ -110,4 +111,12 @@ pub async fn upload_file(mut multipart: Multipart) -> Result<HttpResponse,Error>
 }
 
     Ok(HttpResponse::Ok().body("File uploaded successfully"))
+}
+
+
+#[get("/user/extrator")]
+pub async fn user_extractor(user: UserProfile) -> impl Responder {
+    HttpResponse::Ok().body(format!("User ID: {}, Role: {}", user.user_id, user.role))
+
+
 }
