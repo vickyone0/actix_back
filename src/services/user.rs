@@ -43,3 +43,8 @@ pub async fn update_user(user: User) -> Result<User, String> {
     }
     
 }
+
+pub async fn get_user_id(user_id: u32) -> Result<String, String> {
+    
+    Ok(format!("User ID: {}",user_id) )
+}

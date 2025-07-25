@@ -55,6 +55,11 @@ async fn main() -> std::io::Result<()> {
             .service(handlers::user::user_info)
             .service(handlers::user::update_info)
             .service(handlers::product::list_products)
+            .service(handlers::user::get_user_by_id)
+            .service(handlers::user::search_user)
+            .service(handlers::user::list_products)
+            .service(handlers::user::create_item)
+            .service(handlers::user::upload_file)
     })
     .bind(&server_address)?
     .workers(settings.server.worker_threads as usize)
