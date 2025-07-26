@@ -3,6 +3,7 @@ use actix_web::{ App, HttpServer};
 use serde::{Deserialize, Serialize};
 use config::{Config, File};
 use actix_back::handlers::{self, user::update_info};
+use actix_back::middleware::execution_time::RequestIdMiddleware;
 
 #[derive(Deserialize)]
 struct Settings {
@@ -52,6 +53,7 @@ async fn main() -> std::io::Result<()> {
          App::new()
         //     .service(hello)
         //     .service(greet)
+            .wrap(RequestIdMiddleware)
             .service(handlers::user::user_info)
             .service(handlers::user::update_info)
             .service(handlers::product::list_products)
