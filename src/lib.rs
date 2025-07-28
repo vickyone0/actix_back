@@ -1,6 +1,9 @@
 pub mod handlers;
 mod services;
-mod models;
+mod model;
 mod errors;
 mod extractors;
 pub mod middleware;
+pub mod db;
+pub mod models;
+mod schema;

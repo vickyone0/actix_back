@@ -1,11 +1,14 @@
 
-use actix_web::{ App, HttpServer};
+use actix_back::db::establish_connection;
+use actix_web::{ web,App, HttpServer};
 use serde::{Deserialize, Serialize};
 use config::{Config, File};
 use actix_back::handlers::{self, user::update_info};
 use actix_back::middleware::execution_time::RequestIdMiddleware;
 use actix_back::middleware::log::Logger;
 use actix_back::middleware::keyvalidator::ApiKeyValidator;
+use actix_back::middleware::jwt::JWTAuthentication;
+use dotenv::dotenv;
 
 #[derive(Deserialize)]
 struct Settings {
@@ -42,6 +45,10 @@ struct ServerSettings {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
+    dotenv().ok();
+
+    let pool = establish_connection();
+
     let config = Config::builder()
         .add_source(File::with_name("config"))
         .build()
@@ -51,13 +58,14 @@ async fn main() -> std::io::Result<()> {
 
     let server_address = format!("{}:{}", settings.server.host,settings.server.port);
 
-    HttpServer::new(|| {
+    HttpServer::new(move || {
          App::new()
         //     .service(hello)
         //     .service(greet)
+            .app_data(web::Data::new(pool.clone()))
             .wrap(Logger)
+            .wrap(JWTAuthentication)
             .wrap(RequestIdMiddleware)
-            .wrap(ApiKeyValidator::new("secret_api_key".to_string()))
             .service(handlers::user::user_info)
             .service(handlers::user::update_info)
             .service(handlers::product::list_products)
