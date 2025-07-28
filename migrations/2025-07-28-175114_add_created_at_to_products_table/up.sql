@@ -1,0 +1,3 @@
+-- Your SQL goes here
+ALTER TABLE products
+ADD COLUMN created_ats TIMESTAMP DEFAULT CURRENT_TIMESTAMP;

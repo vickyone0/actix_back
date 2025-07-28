@@ -262,6 +262,7 @@ dependencies = [
  "jsonwebtoken",
  "lazy_static",
  "openssl",
+ "r2d2",
  "serde",
  "serde_json",
  "tokio",

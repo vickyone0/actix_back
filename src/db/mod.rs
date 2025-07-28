@@ -1,26 +1,23 @@
-// use diesel::PgConnection;
-// use diesel::r2d2::{ConnectionManager, Pool, PooledConnection, Error as R2D2Error};
-// use dotenv::dotenv;
-// use std::env;
 use diesel::pg::PgConnection;
-use diesel::prelude::*;
-use dotenv::dotenv;
+use diesel::r2d2::{self, ConnectionManager};
 use std::env;
+use std::time::Duration;
 
-// pub type DbPool = Pool<ConnectionManager<PgConnection>>;
-// pub type DbConnection = PooledConnection<ConnectionManager<PgConnection>>;
+pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
-// pub fn establish_connection() -> DbPool {
-//     dotenv().ok();
-//     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-//     let manager = ConnectionManager::<PgConnection>::new(database_url);
-//     Pool::builder()
-//         .build(manager)
-//         .expect("Failed to create pool.")
-// }
-pub fn establish_connection() -> PgConnection {
-    dotenv().ok();
 
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    PgConnection::establish(&database_url).unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
+pub fn establish_connection() -> Pool {
+    dotenv::dotenv().ok();
+
+    let database_url = env::var("DATABASE_URL").expect("Database url must be set");
+
+    let manager = ConnectionManager::<PgConnection>::new(database_url);
+
+   r2d2::Pool::builder()
+        .max_size(15)
+        .min_idle(Some(5))
+        .connection_timeout(Duration::from_secs(30))
+        .idle_timeout(Some(Duration::from_secs(600)) )
+        .build(manager)
+        .expect("Failed to create pool.")
 }

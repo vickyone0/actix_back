@@ -49,10 +49,7 @@ async fn main() -> std::io::Result<()> {
 
     let pool = establish_connection();
 
-    let config = Config::builder()
-        .add_source(File::with_name("config"))
-        .build()
-        .unwrap();
+    let db_pool = web::Data::new(pool);
 
     let settings: Settings = config.try_deserialize().unwrap();
 
@@ -62,7 +59,7 @@ async fn main() -> std::io::Result<()> {
          App::new()
         //     .service(hello)
         //     .service(greet)
-            .app_data(web::Data::new(pool.clone()))
+            .app_data(db_pool.clone())
             .wrap(Logger)
             .wrap(JWTAuthentication)
             .wrap(RequestIdMiddleware)
