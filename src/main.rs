@@ -47,9 +47,13 @@ async fn main() -> std::io::Result<()> {
 
     dotenv().ok();
 
-    let pool = establish_connection();
+    // let pool = establish_connection();
+    // let db_pool = web::Data::new(pool);
 
-    let db_pool = web::Data::new(pool);
+    let config = Config::builder()
+        .add_source(File::with_name("config"))
+        .build()
+        .unwrap();
 
     let settings: Settings = config.try_deserialize().unwrap();
 
@@ -59,10 +63,12 @@ async fn main() -> std::io::Result<()> {
          App::new()
         //     .service(hello)
         //     .service(greet)
-            .app_data(db_pool.clone())
-            .wrap(Logger)
-            .wrap(JWTAuthentication)
-            .wrap(RequestIdMiddleware)
+            //.app_data(db_pool.clone())
+            //.wrap(Logger)
+            //.wrap(JWTAuthentication)
+            //.wrap(RequestIdMiddleware)
+            .service(handlers::user::echos)
+            .service(handlers::user::async_call)
             .service(handlers::user::user_info)
             .service(handlers::user::update_info)
             .service(handlers::product::list_products)
@@ -78,4 +84,5 @@ async fn main() -> std::io::Result<()> {
     .workers(settings.server.worker_threads as usize)
     .run()
     .await
+
 }
